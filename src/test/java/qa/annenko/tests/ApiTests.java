@@ -27,14 +27,17 @@ public class ApiTests {
 
     @Test
     public void itemsOfGetListOfUserTest() {
-        given()
+        ResponseListOfUser response = given()
                 .log().uri()
                 .when()
                 .get("https://reqres.in/api/users?page=2")
                 .then()
                 .log().body()
                 .statusCode(200)
-                .body("data.last_name", hasItems("Lawson", "Ferguson", "Funke"));
+                .extract().as(ResponseListOfUser.class);
+        assertThat(response.getData().get(0).getLast_name().equals("Lawson"));
+        assertThat(response.getData().get(1).getLast_name().equals("Ferguson"));
+        assertThat(response.getData().get(2).getLast_name().equals("Funke"));
     }
 
     @Test
