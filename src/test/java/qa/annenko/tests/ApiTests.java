@@ -3,11 +3,14 @@ package qa.annenko.tests;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import qa.annenko.models.*;
+import qa.annenko.specs.CreateUserRequestSpec;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.core.Is.is;
+import static qa.annenko.specs.CreateUserRequestSpec.createUserRequestSpec;
+import static qa.annenko.specs.CreateUserResponseSpec.createUserResponseSpec;
 
 public class ApiTests {
 
@@ -81,13 +84,14 @@ public class ApiTests {
         bodyRequest.setJob("zion resident");
 
         ResponseCreateUser response = given()
-                .log().uri()
-                .contentType(ContentType.JSON)
+                .spec(createUserRequestSpec)
+//                .log().uri()
+//                .contentType(ContentType.JSON)
                 .body(bodyRequest)
                 .when()
-                .put("https://reqres.in/api/users/2")
+                .put("/2")
                 .then()
-                .log().body()
+                .spec(createUserResponseSpec)
                 .statusCode(200)
                 .extract().as(ResponseCreateUser.class);
         assertThat(response.getName().equals("morpheus"));

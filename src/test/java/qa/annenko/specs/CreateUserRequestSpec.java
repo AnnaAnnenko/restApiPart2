@@ -8,10 +8,10 @@ import static qa.annenko.helpers.CustomApiListener.withCustomTemplates;
 
 public class CreateUserRequestSpec {
 
-    public static RequestSpecification loginRequestSpec = with()
+    public static RequestSpecification createUserRequestSpec = with()
             .filter(withCustomTemplates())
             .baseUri("https://reqres.in")
-            .basePath("/api/login")
+            .basePath("/api/users")
             .log().all()
             .contentType(JSON);
 }
