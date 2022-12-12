@@ -7,12 +7,12 @@ import static io.restassured.filter.log.LogDetail.BODY;
 import static io.restassured.filter.log.LogDetail.STATUS;
 import static org.hamcrest.Matchers.notNullValue;
 
-public class CreateUserResponseSpec {
+public class UpdateUserResponseSpec {
 
-    public static ResponseSpecification createUserResponseSpec = new ResponseSpecBuilder()
+    public static ResponseSpecification updateUserResponseSpec = new ResponseSpecBuilder()
             .log(STATUS)
             .log(BODY)
-            .expectStatusCode(201)
+            .expectStatusCode(200)
             .expectBody("name", notNullValue())
             .build();
 }

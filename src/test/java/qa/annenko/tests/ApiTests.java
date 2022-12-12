@@ -1,42 +1,42 @@
 package qa.annenko.tests;
 
-import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import qa.annenko.models.*;
-import qa.annenko.specs.CreateUserRequestSpec;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.core.Is.is;
+import static qa.annenko.specs.CommonRequestSpec.commonRequestSpec;
 import static qa.annenko.specs.CreateUserRequestSpec.createUserRequestSpec;
 import static qa.annenko.specs.CreateUserResponseSpec.createUserResponseSpec;
+import static qa.annenko.specs.DeleteUserResponseSpec.deleteUserResponseSpec;
+import static qa.annenko.specs.ListOfUserResponseSpec.listOfUserResponseSpec;
+import static qa.annenko.specs.SingleUserNotFoundResponseSpec.singleUserNotFoundResponseSpec;
+import static qa.annenko.specs.UnsuccessfulLoginRequestSpec.unsuccessfulLoginRequestSpec;
+import static qa.annenko.specs.UnsuccessfulLoginResponseSpec.unsuccessfulLoginResponseSpec;
+import static qa.annenko.specs.UpdateUserResponseSpec.updateUserResponseSpec;
 
 public class ApiTests {
 
     @Test
     public void totalOfGetListOfUserTest() {
         ResponseListOfUser response = given()
-                .log().uri()
+                .spec(commonRequestSpec)
                 .when()
-                .get("https://reqres.in/api/users?page=2")
+                .get("?page=2")
                 .then()
-                .log().body()
-                .statusCode(200)
+                .spec(listOfUserResponseSpec)
                 .extract().as(ResponseListOfUser.class);
-//                .body("total", is(12));
         assertThat(response.getTotal() == 12);
     }
 
     @Test
     public void itemsOfGetListOfUserTest() {
         ResponseListOfUser response = given()
-                .log().uri()
+                .spec(commonRequestSpec)
                 .when()
-                .get("https://reqres.in/api/users?page=2")
+                .get("?page=2")
                 .then()
-                .log().body()
-                .statusCode(200)
+                .spec(listOfUserResponseSpec)
                 .extract().as(ResponseListOfUser.class);
         assertThat(response.getData().get(0).getLast_name().equals("Lawson"));
         assertThat(response.getData().get(1).getLast_name().equals("Ferguson"));
@@ -47,12 +47,11 @@ public class ApiTests {
     public void singleUserNotFoundTest() {
 
         given()
-                .log().uri()
+                .spec(commonRequestSpec)
                 .when()
-                .get("https://reqres.in/api/users/23")
+                .get("/23")
                 .then()
-                .log().body()
-                .statusCode(404);
+                .spec(singleUserNotFoundResponseSpec);
     }
 
     @Test
@@ -63,14 +62,12 @@ public class ApiTests {
         bodyRequest.setJob("leader");
 
         ResponseCreateUser response = given()
-                .log().uri()
-                .contentType(ContentType.JSON)
+                .spec(createUserRequestSpec)
                 .body(bodyRequest)
                 .when()
                 .post("https://reqres.in/api/users")
                 .then()
-                .log().body()
-                .statusCode(201)
+                .spec(createUserResponseSpec)
                 .extract().as(ResponseCreateUser.class);
         assertThat(response.getName().equals("morpheus"));
         assertThat(response.getJob().equals("leader"));
@@ -85,14 +82,11 @@ public class ApiTests {
 
         ResponseCreateUser response = given()
                 .spec(createUserRequestSpec)
-//                .log().uri()
-//                .contentType(ContentType.JSON)
                 .body(bodyRequest)
                 .when()
                 .put("/2")
                 .then()
-                .spec(createUserResponseSpec)
-                .statusCode(200)
+                .spec(updateUserResponseSpec)
                 .extract().as(ResponseCreateUser.class);
         assertThat(response.getName().equals("morpheus"));
         assertThat(response.getJob().equals("zion resident"));
@@ -102,12 +96,11 @@ public class ApiTests {
     public void deleteUserTest() {
 
         given()
-                .log().uri()
+                .spec(commonRequestSpec)
                 .when()
-                .delete("https://reqres.in/api/users/2")
+                .delete("/2")
                 .then()
-                .log().body()
-                .statusCode(204);
+                .spec(deleteUserResponseSpec);
     }
 
     @Test
@@ -117,14 +110,12 @@ public class ApiTests {
         bodyRequest.setEmail("peter@klaven");
 
         ResponseUnsuccessfulLogin response= given()
-                .log().uri()
-                .contentType(ContentType.JSON)
+                .spec(unsuccessfulLoginRequestSpec)
                 .body(bodyRequest)
                 .when()
-                .post("https://reqres.in/api/login")
+                .post()
                 .then()
-                .log().body()
-                .statusCode(400)
+                .spec(unsuccessfulLoginResponseSpec)
                 .extract().as(ResponseUnsuccessfulLogin.class);
         assertThat(response.getError().equals("Missing password"));
     }
